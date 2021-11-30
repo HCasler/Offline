@@ -1065,63 +1065,67 @@ namespace mu2e {
     if (_config.getBool("targetPS.hasVD.backward", false)) {
       vdId = VirtualDetectorId::PT_Back;
       if ( vdg->exist(vdId) )
-	{
-	  const VolumeInfo& parent = _helper->locateVolInfo("ProductionTargetMother");
-	  G4Tubs *PTMoth = static_cast<G4Tubs*>(parent.solid);
+  {
+    const VolumeInfo& parent = _helper->locateVolInfo("ProductionTargetMother");
+    double radius = _config.getDouble("targetPS_supportRingInnerRadius", 15.0);
+    GeomHandle<ProductionTarget> tgt;
+    
+    TubsParams vdParams(0., radius-0.01, vdg->getHalfLength());
 
-	  TubsParams vdParams(0., PTMoth->GetOuterRadius(), vdg->getHalfLength());
+    G4ThreeVector unrotated(0., 0., -tgt->targetHalfLengthByVersion() - vdg->getHalfLength());
+    G4ThreeVector vdCenterInParent = tgt->productionTargetRotation().inverse() * unrotated;
 
-	  G4ThreeVector vdCenterInParent(0., 0., -PTMoth->GetZHalfLength() + vdg->getHalfLength());
+    VolumeInfo vdInfo = nestTubs(VirtualDetector::volumeName(vdId),
+               vdParams,
+               downstreamVacuumMaterial,
+               &tgt->productionTargetRotation(),
+               vdCenterInParent,
+               parent,
+               vdId,
+               vdIsVisible,
+               G4Color::Red(),
+               vdIsSolid,
+               forceAuxEdgeVisible,
+               placePV,
+               false
+               );
 
-	  VolumeInfo vdInfo = nestTubs(VirtualDetector::volumeName(vdId),
-				       vdParams,
-				       downstreamVacuumMaterial,
-				       0,
-				       vdCenterInParent,
-				       parent,
-				       vdId,
-				       vdIsVisible,
-				       G4Color::Red(),
-				       vdIsSolid,
-				       forceAuxEdgeVisible,
-				       placePV,
-				       false
-				       );
+    doSurfaceCheck && checkForOverlaps(vdInfo.physical, _config, verbosityLevel>0);
 
-	  doSurfaceCheck && checkForOverlaps(vdInfo.physical, _config, verbosityLevel>0);
-
-	}
+  }
     }
 
     if (_config.getBool("targetPS.hasVD.forward", false)) {
       vdId = VirtualDetectorId::PT_Front;
       if ( vdg->exist(vdId) )
-	{
-	  const VolumeInfo& parent = _helper->locateVolInfo("ProductionTargetMother");
-	  G4Tubs *PTMoth = static_cast<G4Tubs*>(parent.solid);
+  {
+    const VolumeInfo& parent = _helper->locateVolInfo("ProductionTargetMother");
+    double radius = _config.getDouble("targetPS_supportRingInnerRadius", 15.0);
+    GeomHandle<ProductionTarget> tgt;
 
-	  TubsParams vdParams(0., PTMoth->GetOuterRadius(), vdg->getHalfLength());
+    TubsParams vdParams(0., radius, vdg->getHalfLength());
 
-	  G4ThreeVector vdCenterInParent(0., 0., PTMoth->GetZHalfLength() - vdg->getHalfLength());
+    G4ThreeVector unrotated(0., 0., tgt->targetHalfLengthByVersion() + vdg->getHalfLength());
+    G4ThreeVector vdCenterInParent = tgt->productionTargetRotation().inverse() * unrotated;
 
-	  VolumeInfo vdInfo = nestTubs(VirtualDetector::volumeName(vdId),
-				       vdParams,
-				       downstreamVacuumMaterial,
-				       0,
-				       vdCenterInParent,
-				       parent,
-				       vdId,
-				       vdIsVisible,
-				       G4Color::Red(),
-				       vdIsSolid,
-				       forceAuxEdgeVisible,
-				       placePV,
-				       false
-				       );
+    VolumeInfo vdInfo = nestTubs(VirtualDetector::volumeName(vdId),
+               vdParams,
+               downstreamVacuumMaterial,
+               &tgt->productionTargetRotation(),
+               vdCenterInParent,
+               parent,
+               vdId,
+               vdIsVisible,
+               G4Color::Red(),
+               vdIsSolid,
+               forceAuxEdgeVisible,
+               placePV,
+               false
+               );
 
-	  doSurfaceCheck && checkForOverlaps(vdInfo.physical, _config, verbosityLevel>0);
+    doSurfaceCheck && checkForOverlaps(vdInfo.physical, _config, verbosityLevel>0);
 
-	}
+  }
     }
 
     // An XY plane between the PS and anything ExtMon
