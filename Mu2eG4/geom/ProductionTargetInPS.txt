@@ -23,8 +23,8 @@ string targetPS_materialName      = "G4_W";
 bool   targetPS.visible         = true;
 bool   targetPS.solid           = false;
 
-bool   targetPS.hasVD.backward = false;
-bool   targetPS.hasVD.forward  = false;
+bool   targetPS.hasVD.backward = true;
+bool   targetPS.hasVD.forward  = true;
 
 // Hubs for holding target core
 double targetPS_Hub_hang_Length     =      5.0;  // mm
